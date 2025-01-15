@@ -1,5 +1,8 @@
 name: Deployment pipeline
 
+env:
+  CONDITION: ${{ contains(github.event.head_commit.message, '#skip')  }}
+
 on:
   push:
     branches:
@@ -7,7 +10,7 @@ on:
   pull_request:
     branches: [main]
     types: [opened, synchronize]
-
+#testing
 jobs:
   simple_deployment_pipeline:
     runs-on: ubuntu-20.04
@@ -25,8 +28,18 @@ jobs:
       - name: test
         run: npm test
       - name: Trigger deployment
-        if: ${{ github.event_name == 'push' }}
+        if: ${{ github.event_name == 'push' && env.CONDITION == 'false'}}
         run: curl ${{ secrets.RENDER_API_KEY }}
+      - name: commit messages
+        env:
+          COMMIT_MESSAGES: ${{ toJson(github.event.commits.*.message) }}
+
+        run: echo "$COMMIT_MESSAGES"
+
+      - name: another
+        env:
+          TEST: ${{ github.event.head_commit.message }}
+        run: echo "$TEST"
 
   tag_release:
     needs: [simple_deployment_pipeline]
