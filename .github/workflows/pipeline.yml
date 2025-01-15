@@ -10,7 +10,7 @@ on:
   pull_request:
     branches: [main]
     types: [opened, synchronize]
-#testing
+
 jobs:
   simple_deployment_pipeline:
     runs-on: ubuntu-20.04
